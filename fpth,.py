@@ -40,6 +40,7 @@ i = 0
 i1 = 0
 i2 = 0
 ran = 0
+rand = 0
 def rast():
     global kartoshka, ka, i, rabota, rabotau
     i+=1
@@ -54,7 +55,7 @@ def up(sel):
         if den >= balance:
             up.set("Улучшения")
             rabota+=1
-            den-=500
+            den-=balance
             dengi.configure(text=f"💵 Деняк : {den}")
             balance+=150
             up.configure(values=[f"Работник на поле азербайджанской картошки: +1 картошка за один урожай (Стоимость - {balance} деняк).", "Работник на урановые рудники: Позволяет копать уран (Стоимость - 5000 деняк).","Сосед, работающий на урановом руднике: +2 к урану за камень (Стоимость - 5000)","Капитанчик, который сидит в подвале: позволяет снимать стримы (надо кликнуть 10 раз на кнопку)(Стоимость - 10000 деняк)."])
@@ -85,11 +86,11 @@ def up(sel):
         else:
             up.set("Нет деняк!")
             r.after(2000, lambda: up.set("Улучшения"))
-    elif sel == "Сосед, работающий на урановом руднике: +2 к урану за камень (Стоимость - 5000)":
+    elif sel == "Сосед, работающий на урановом руднике: +1 к урану за камень (Стоимость - 5000)":
         if den >= 5000:
             if kopatik == True:
                 up.set("Улучшения")
-                rabotau+=2
+                rabotau+=1
                 den-=5000
                 dengi.configure(text=f"💵 Деняк : {den}")
             else:
@@ -161,9 +162,10 @@ def new_news():
     r.after(60000, new_news)
 def check():
     global mf, den, timer, timerl, go
-    if den >= 100000:
+    if den >= 1000000:
         mf.destroy()
-        go.configure(text_color="#57A3F2", text=f"Поздравляю вы прошли игру! \n Спасибо за игру! \n Чтоб у вас дома всегда была азербайджанская картошка!", font=customtkinter.CTkFont(size=50, weight="bold"))
+        go.configure(text_color="#57A3F2", text=f"Поздравляю вы прошли игру! \n Спасибо за игру! \n Чтоб у вас дома всегда была азербайджанская картошка! \n Чтобы начать все заново удалите файлы \n в той же папке с игрой с названиями по типу data.db \n Расширения могут быть разными и файлов может быть несколько", font=customtkinter.CTkFont(size=19, weight="bold"))
+        
     else:
         r.after(1, check)
 def autosave():
@@ -184,6 +186,21 @@ def autosave():
     savel.configure(text="Сохранено!")
     r.after(2000, lambda: savel.configure(text="..."))
     r.after(10000, autosave)
+def sosed():
+    global ka, kartoshka, rand
+    if ka != 0:
+        kart=random.randint(1, ka)
+        dialog = customtkinter.CTkInputDialog(text = f"К вам пришел сосед и попросил {kart} картошки в кредит! Отдать?", title="Напиши да или нет: ")
+        if dialog.get_input() == "да" or dialog.get_input() == "Да":
+            ka-=kart
+            if random.randint(1, 100) <= 10:
+                ka+=kart*3
+                dialog = customtkinter.CTkInputDialog(text = "Вам вернули х3 картофли (это окно закройте)")    
+            else:
+                dialog = customtkinter.CTkInputDialog(text = "Вам не вернули ничего (это окно закройте)")
+            kartoshka.configure(text=f"🥔 Азербайджанской картошки : {ka}")
+    rand = random.randint(30000, 120000)
+    r.after(rand, sosed)
 r = customtkinter.CTk()
 customtkinter.set_default_color_theme("green")
 r.title("Симулятор Азербайджана")
@@ -191,7 +208,7 @@ r.geometry('750x650')
 r.configure(fg_color="#1a1a1a")
 r.resizable(False, False)
 
-go = customtkinter.CTkLabel(r)
+go = customtkinter.CTkLabel(r, text="")
 go.pack(pady=5, padx=20)
 
 mf = customtkinter.CTkFrame(r,fg_color="#242424", corner_radius=15 )
@@ -212,7 +229,7 @@ tutu.pack(pady=5, padx=20)
 tuts = customtkinter.CTkLabel(tutf, text_color="#57A3F2", text=f"1 стрим - от 264 до 1000 деняк, + его не надо продавать", font=customtkinter.CTkFont(size=11, weight="bold"))
 tuts.pack(pady=5, padx=20)
 
-goal = customtkinter.CTkLabel(tutf, text_color="#57A3F2", text=f"Цель - 100000 деняк", font=customtkinter.CTkFont(size=11, weight="bold"))
+goal = customtkinter.CTkLabel(tutf, text_color="#57A3F2", text=f"Цель - 1000000 деняк", font=customtkinter.CTkFont(size=11, weight="bold"))
 goal.pack(pady=5, padx=20)
 
 news = customtkinter.CTkOptionMenu(tutf, values=[], width=500, dynamic_resizing=True)
@@ -231,7 +248,7 @@ butons2.pack(pady=3, padx=125, fill="both")
 sell = customtkinter.CTkButton(butons2, text="Продать все 📠", fg_color="#a6d388", width=200, text_color="#1a1a1a", font=customtkinter.CTkFont(size=24), command=sell)
 sell.pack(anchor="w", pady=0, padx=20, side="left")
 
-up = customtkinter.CTkOptionMenu(butons2, values=[f"Работник на поле азербайджанской картошки: +1 картошка за один урожай (Стоимость - {balance} деняк).", "Работник на урановые рудники: Позволяет копать уран (Стоимость - 5000 деняк).","Сосед, работающий на урановом руднике: +2 к урану за камень (Стоимость - 5000)","Капитанчик, который сидит в подвале: позволяет снимать стримы (надо кликнуть 10 раз на кнопку)(Стоимость - 10000 деняк)."], command=up, dynamic_resizing=True)
+up = customtkinter.CTkOptionMenu(butons2, values=[f"Работник на поле азербайджанской картошки: +1 картошка за один урожай (Стоимость - {balance} деняк).", "Работник на урановые рудники: Позволяет копать уран (Стоимость - 5000 деняк).","Сосед, работающий на урановом руднике: +1 к урану за камень (Стоимость - 5000)","Капитанчик, который сидит в подвале: позволяет снимать стримы (надо кликнуть 10 раз на кнопку)(Стоимость - 10000 деняк)."], command=up, dynamic_resizing=True)
 up.set("Улучшения")
 up.pack(pady=5, side="left")
 
@@ -262,4 +279,6 @@ savel.pack(pady=10, padx=10, side="left")
 r.after(60000, new_news)
 r.after(1, check)
 r.after(10000, autosave)
+rand = random.randint(30000, 120000)
+r.after(rand, sosed)
 r.mainloop()
