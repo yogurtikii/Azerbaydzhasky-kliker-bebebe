@@ -4,6 +4,7 @@ import time
 import random
 import shelve
 import os
+from CTkMessagebox import CTkMessagebox
 if os.path.exists("data.db") or os.path.exists("data.db.dat"):
     db = shelve.open("data.db", flag='r')
     ka = db["ka"]
@@ -17,6 +18,9 @@ if os.path.exists("data.db") or os.path.exists("data.db.dat"):
     ura = db["ura"]
     balance = db["balance"]
     timer = db["timer"]
+    cena = db["cena"]
+    profit = db["profit"]
+    rep = db["rep"]
     db.close()
 else:
     db = shelve.open("data.db", flag='c')
@@ -31,10 +35,13 @@ else:
     db["ura"] = 50
     db["balance"] = 500
     db["timer"] = 0.0
-    
+    db["cena"] = 0
+    db["profit"] = 0
+    db["rep"] = 0
     ka, ur, den, rabotau, rabota = 0, 0, 0, 1, 1
     kopatik, strimik = False, False
     kar, ura, balance, timer = 22, 50, 500, 0.0
+    cena, profit, rep = 0, 0, 0
     db.close()
 i = 0
 i1 = 0
@@ -183,6 +190,9 @@ def autosave():
         db["ura"] = ura
         db["balance"] = balance
         db["timer"] = timer
+        db["cena"] = cena
+        db["profit"] = profit
+        db["rep"] = rep
     savel.configure(text="Сохранено!")
     r.after(2000, lambda: savel.configure(text="..."))
     r.after(10000, autosave)
@@ -190,17 +200,105 @@ def sosed():
     global ka, kartoshka, rand
     if ka != 0:
         kart=random.randint(1, ka)
-        dialog = customtkinter.CTkInputDialog(text = f"К вам пришел сосед и попросил {kart} картошки в кредит! Отдать?", title="Напиши да или нет: ")
-        if dialog.get_input() == "да" or dialog.get_input() == "Да":
+        msg = CTkMessagebox(
+        title="Сосед!", 
+        message=f"К вам пришел сосед и попросил в долг {kart} картошки, отдать?", 
+        icon="question",
+        option_1="Отдать",
+        option_2="Не отдавать"
+    )
+        if msg.get() == "Отдать":
             ka-=kart
             if random.randint(1, 100) <= 10:
                 ka+=kart*3
-                dialog = customtkinter.CTkInputDialog(text = "Вам вернули х3 картофли (это окно закройте)")    
+                alert = CTkMessagebox(
+                title="Сосед!", 
+                message="Вам отдали х3 картошки!", 
+                icon="info",
+                option_1="OK"
+            )
             else:
-                dialog = customtkinter.CTkInputDialog(text = "Вам не вернули ничего (это окно закройте)")
+                aler = CTkMessagebox(
+                title="Сосед!", 
+                message="Вам не отдали ничего!", 
+                icon="info",
+                option_1="OK"
+            )
             kartoshka.configure(text=f"🥔 Азербайджанской картошки : {ka}")
     rand = random.randint(30000, 120000)
     r.after(rand, sosed)
+def com():
+    global profit, cena, kar, rand, rep
+    randch = random.randint(1, 2)
+    profit = random.randint(60, 90)
+    cena = random.randint(kar - random.randint(1, 10), kar + random.randint(1, 10))
+    grocery_chains = ["Пятёрочка", "Магнит", "Перекрёсток", "Чижик", "Красное & Белое", "Бристоль", "Лента", "ВкусВилл", "Ашан", "Дикси", "Монетка", "Да!", "О’КЕЙ", "METRO Cash & Carry", "Ярче!", "Спар (SPAR)", "Азбука Вкуса", "Глобус", "Магнит Семейный", "Самокат"]
+    choise=random.choice(grocery_chains)
+    if randch == 1:
+        msg = CTkMessagebox(
+        title=f"{choise}", 
+        message=f"К вам пришел представитель компаниии {choise}, и предложил забирать каждый день у тебя 5 картошки, и отдавать {profit}% от дохода продавая картошку по {cena} деняк, согласиться?", 
+        icon="question",
+        option_1="Согласиться",
+        option_2="Не cоглашаться"
+    )
+        if msg.get() == "Согласиться":
+            rep=100
+            r.after(60000, yes)
+        else:
+            rand = random.randint(120000, 300000)
+            r.after(rand, com)
+def yes():
+    global ka, rep, cena, den, rand
+    if ka < 5:
+        if ka == 0:
+            rep-=10
+            msg = CTkMessagebox(
+            title="Потеря потерь", 
+            message=f"Вы потеряли: 10 репутации \n Сейчас репутации: {rep}", 
+            icon="info",
+            option_1="OK",
+        )
+        else:
+            rep-=(5-ka)*2
+            msg = CTkMessagebox(
+            title="Потеря потерь", 
+            message=f"Вы потеряли: {(5-ka)*2} репутации \n Сейчас репутации: {rep}", 
+            icon="info",
+            option_1="OK",
+        )
+            msg = CTkMessagebox(
+            title="Отчет", 
+            message=f"Отчет за продажи: \n Упаковки: -18 деняк \n Картошки продано: {ka} \n Денег получено: {round(ka*cena*(profit/100))} \n Итого: {round(ka*cena*(profit/100))-18}", 
+            icon="info",
+            option_1="OK",
+        )
+            den+=round(ka*cena*(profit/100))-18
+            ka-=ka
+    else:
+        msg = CTkMessagebox(
+        title="Отчет", 
+        message=f"Отчет за продажи: \n Упаковки: -18 деняк \n Картошки продано: 5 \n Денег получено: {round(5*cena*(profit/100))} \n Итого: {round(5*cena*(profit/100))-18}", 
+        icon="info",
+        option_1="OK",
+    )
+        rep+=2
+        den+=round(5*cena*(profit/100))-18
+        ka-=5
+    dengi.configure(text=f"💵 Деняк : {den}")
+    kartoshka.configure(text=f"🥔 Азербайджанской картошки : {ka}")
+    if rep != 0:
+        r.after(60000, yes)
+    else:
+        msg = CTkMessagebox(
+        title="Плаки плаки", 
+        message=f"С вами разорвали контракт! \n К вам могут прийти новые представители!", 
+        icon="info",
+        option_1="OK",
+    )
+        rand = random.randint(120000, 300000)
+        r.after(rand, com)
+
 r = customtkinter.CTk()
 customtkinter.set_default_color_theme("green")
 r.title("Симулятор Азербайджана")
@@ -243,7 +341,7 @@ butons = customtkinter.CTkFrame(mf,fg_color="#383838", corner_radius=15 )
 butons.pack(pady=20, padx=20, fill="both")
 
 butons2 = customtkinter.CTkFrame(butons,fg_color="#474747", corner_radius=15 )
-butons2.pack(pady=3, padx=125, fill="both")
+butons2.pack(pady=3, padx=50, fill="both")
 
 sell = customtkinter.CTkButton(butons2, text="Продать все 📠", fg_color="#a6d388", width=200, text_color="#1a1a1a", font=customtkinter.CTkFont(size=24), command=sell)
 sell.pack(anchor="w", pady=0, padx=20, side="left")
@@ -281,4 +379,9 @@ r.after(1, check)
 r.after(10000, autosave)
 rand = random.randint(30000, 120000)
 r.after(rand, sosed)
+if rep == 0:
+    rand = random.randint(120000, 300000)
+    r.after(rand, com)
+if rep != 0:
+    r.after(60000, yes)
 r.mainloop()
