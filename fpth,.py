@@ -58,6 +58,7 @@ rand = 0
 geti = ""
 ins = []
 summ = 0
+proh = True
 def rast():
     global kartoshka, ka, i, rabota, rabotau
     i+=1
@@ -115,7 +116,7 @@ def up(sel):
         else:
             up.set("Нет деняк!")
             r.after(2000, lambda: up.set("Улучшения"))
-def kopat():
+def kopaat():
     global uran, ur, i1, kopatik, rabotau
     if kopatik == True:
         i1+=1
@@ -179,9 +180,9 @@ def new_news():
     r.after(60000, new_news)
 def check():
     global mf, den, go, ka, ur, rabotau, rabota, kopatik, strimik, kar, ura, balance, timer, cena, profit, rep, proc, choise
-    if den >= 1000000:
+    if den >= 1000000 and proh == True:
         mf.destroy()
-        go.configure(text_color="#57A3F2", text=f"Поздравляю вы прошли игру! \n Спасибо за игру! \n Чтоб у вас дома всегда была азербайджанская картошка! \n Выши сохранения были очщенны \n Вам теперь доступны читы!", font=customtkinter.CTkFont(size=19, weight="bold"))
+        go.configure(text_color="#57A3F2", text=f"Поздравляю вы прошли игру! \n Спасибо за игру! \n Чтоб у вас дома всегда была азербайджанская картошка! \n Ваши сохранения были очищенны \n Вам теперь доступны читы!", font=customtkinter.CTkFont(size=19, weight="bold"))
         db = shelve.open("data.db", flag='c')
         db["ka"] = 0
         db["ur"] = 0
@@ -527,8 +528,18 @@ def setkar():
         tutk.configure(text=f"1 картошка - от 1 до {kar} деняк")
     except ValueError:
         print(".")
+def autocliker():
+    global chab
+    if bool(chab.get()) == True:
+        r.after(1, rast)
+        r.after(1, kopaat)
+        r.after(1, strim)
+        r.after(1, autocliker)
+def mozhno():
+    global proh, chpb
+    proh = bool(chpb.get())
 def cheatsd():
-    global che, chke, chue, chkob, chstb, churae, chkare
+    global che, chke, chue, chkob, chstb, churae, chkare, chab, chpb
     ch = customtkinter.CTkToplevel(r)
     ch.title("Читы")
     ch.geometry('600x600')
@@ -585,6 +596,23 @@ def cheatsd():
     vast = customtkinter.IntVar(value=0)
     chstb = customtkinter.CTkSwitch(chstf, onvalue=1, offvalue=0, command=strs, variable=vast, text="") 
     chstb.pack(padx=10, side="left")
+
+    chaf = customtkinter.CTkFrame(ch, fg_color="#383838", corner_radius=15)
+    chaf.pack(pady=5, padx=10)
+    chae = customtkinter.CTkLabel(chaf, text_color="#57A3F2", text="Автокликер", font=customtkinter.CTkFont(size=11, weight="bold"))
+    chae.pack(pady=5, padx=10, side = "left")
+    vaa = customtkinter.IntVar(value=0)
+    chab = customtkinter.CTkSwitch(chaf, onvalue=1, offvalue=0, command=autocliker, variable=vaa, text="") 
+    chab.pack(padx=10, side="left")
+    
+    chpf = customtkinter.CTkFrame(ch, fg_color="#383838", corner_radius=15)
+    chpf.pack(pady=5, padx=10)
+    chpe = customtkinter.CTkLabel(chpf, text_color="#57A3F2", text="Можно пройти игру", font=customtkinter.CTkFont(size=11, weight="bold"))
+    chpe.pack(pady=5, padx=10, side = "left")
+    vap = customtkinter.IntVar(value=1)
+    chpb = customtkinter.CTkSwitch(chpf, onvalue=1, offvalue=0, command=mozhno, variable=vap, text="") 
+    chpb.pack(padx=10, side="left")
+    chpb.select()
     
 r = customtkinter.CTk()
 customtkinter.set_default_color_theme("green")
@@ -644,7 +672,7 @@ inso.pack(pady=10, padx=5, side="left")
 rastit = customtkinter.CTkButton(butons, text="Растить картофан 🥔", fg_color="#f9de60", width=200, text_color="#1a1a1a", font=customtkinter.CTkFont(size=24), command=rast)
 rastit.pack(anchor="center", pady=5, padx=20)
 
-kopat = customtkinter.CTkButton(butons, text="Копать уран ⛏", fg_color="#74ff17", width=200, text_color="#1a1a1a", font=customtkinter.CTkFont(size=24), command=kopat)
+kopat = customtkinter.CTkButton(butons, text="Копать уран ⛏", fg_color="#74ff17", width=200, text_color="#1a1a1a", font=customtkinter.CTkFont(size=24), command=kopaat)
 kopat.pack(anchor="center", pady=5, padx=20)
 
 strimit = customtkinter.CTkButton(butons, text="Стримить 💻", fg_color="#57A3F2", width=200, text_color="#1a1a1a", font=customtkinter.CTkFont(size=24), command=strim)
