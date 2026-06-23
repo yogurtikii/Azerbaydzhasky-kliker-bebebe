@@ -24,6 +24,8 @@ if os.path.exists("data.db") or os.path.exists("data.db.dat"):
     proc = db["proc"]
     choise = db["choise"]
     cheats = db["cheats"]
+    stavka = db["stavka"]
+    dayy = db["dayy"]
     db.close()
 else:
     db = shelve.open("data.db", flag='c')
@@ -44,11 +46,15 @@ else:
     db["proc"] = 0
     db["choise"] = "Нет"
     db["cheats"] = False
+    db["stavka"] = 20
+    db["dayy"] = 0
     ka, ur, den, rabotau, rabota = 0, 0, 0, 1, 1
     kopatik, strimik = False, False
     kar, ura, balance, timer = 22, 50, 500, 0.0
     cena, profit, rep, proc, choise = 0, 0, 0, 0, "Нет"
     cheats = False
+    stavka = 20
+    dayy = 0
     db.close()
 i = 0
 i1 = 0
@@ -67,7 +73,7 @@ def rast():
         kartoshka.configure(text=f"🥔 Азербайджанской картошки : {ka}")
         i=0
 def up(sel):
-    global up, den, rabota, kopatik, dengi, rabotau, strimik, balance
+    global up, den, rabota, kopatik, dengi, rabotau, strimik, balance, stavka
     sel=up.get()
     if sel == f"Работник на поле азербайджанской картошки: +1 картошка за один урожай (Стоимость - {balance} деняк).":
         if den >= balance:
@@ -76,7 +82,7 @@ def up(sel):
             den-=balance
             dengi.configure(text=f"💵 Деняк : {den}")
             balance+=150
-            up.configure(values=[f"Работник на поле азербайджанской картошки: +1 картошка за один урожай (Стоимость - {balance} деняк).", "Работник на урановые рудники: Позволяет копать уран (Стоимость - 5000 деняк).","Сосед, работающий на урановом руднике: +1 к урану за камень (Стоимость - 5000)","Капитанчик, который сидит в подвале: позволяет снимать стримы (надо кликнуть 10 раз на кнопку)(Стоимость - 10000 деняк)."])
+            up.configure(values=[f"Работник на поле азербайджанской картошки: +1 картошка за один урожай (Стоимость - {balance} деняк).", "Работник на урановые рудники: Позволяет копать уран (Стоимость - 5000 деняк).","Сосед, работающий на урановом руднике: +1 к урану за камень (Стоимость - 5000)","Капитанчик, который сидит в подвале: позволяет снимать стримы (надо кликнуть 10 раз на кнопку)(Стоимость - 10000 деняк).", "Оптимизирование расходов: снижает налоги на 1% (Стоимость - 1000)"])
         else:
             up.set("Нет деняк!")
             r.after(2000, lambda: up.set("Улучшения"))
@@ -111,6 +117,19 @@ def up(sel):
                 rabotau+=1
                 den-=5000
                 dengi.configure(text=f"💵 Деняк : {den}")
+            else:
+                up.set("Улучшения")
+        else:
+            up.set("Нет деняк!")
+            r.after(2000, lambda: up.set("Улучшения"))
+    elif sel == "Оптимизирование расходов: снижает налоги на 1% (Стоимость - 1000)":
+        if den >= 1000:
+            if stavka != 0:
+                up.set("Улучшения")
+                stavka-=1
+                den-=1000
+                dengi.configure(text=f"💵 Деняк : {den}")
+                stavkal.configure(text=f"Налоги - {stavka}%")
             else:
                 up.set("Улучшения")
         else:
@@ -152,7 +171,7 @@ def sell():
     dengi.configure(text=f"💵 Деняк : {den}")
 
 def new_news():
-    global ran, ura, kar, tutk, tutu, news
+    global ran, ura, kar, tutk, tutu, news, dayy
     m=[]
     funny_news = ["Бакинский кот случайно выиграл партию в нарды, уронив кубики нужной стороной.","Учёные доказали: чай из стакана армуду автоматически становится в два раза вкуснее.","В Гяндже гранат вырос настолько круглым, что его по ошибке пытались использовать в футбольном матче.","Житель Баку установил рекорд, объяснив дорогу туристу, используя только жесты и слово 'проблема нет'.","На свадьбе в Шемахе танцевали так активно, что сейсмографы зафиксировали небольшое землетрясение.","В Ленкорани местный изобретатель создал устройство, которое автоматически добавляет сахар в чай — пока оно работает только с азербайджанским чаем.","Во дворе в Сумгаите голуби научились играть в домино — соседи утверждают, что птицы выигрывают чаще, чем проигрывают.","Таксисты в Баку начали использовать новый навигационный метод: вместо GPS они спрашивают дорогу у бабушек у подъезда — точность 100 %.","В Нахчыване кот занял место на лавочке в парке и не пускал никого два часа — оказалось, он ждал, пока принесут его любимый кебаб.","В Баку дворник случайно смахнул метлой с тротуара все листья — местные жители подозревают, что это была репетиция идеального осеннего дня.","В Мингечевире местный рыбак поймал рыбу, которая, по его словам, рассказала анекдот — свидетели утверждают, что шутка была действительно смешной.","В одном из бакинских дворов дедушка научил воробьёв играть в лото — теперь они собираются каждую неделю и громко обсуждают ставки.","В Шеки местный почтальон начал доставлять письма, привязывая их к голубям — голуби, правда, иногда возвращаются с ответами, которых никто не ждал.","В Масаллы жители заметили, что после дождя лужи принимают форму граната — учёные пока не могут объяснить это явление.","В Закатале кот залез на крышу и отказался спускаться, пока ему не принесут чай с вареньем — переговоры длились три часа и завершились успехом."]
     ran=random.randint(-10, 10)
@@ -176,6 +195,8 @@ def new_news():
     tutu.configure(text=f"1 уран - от 22 до {ura} деняк")
     news.set("НОВЫЙ ДЕНЬ - НОВЫЕ НОВОСТИ")
     news.configure(values=m)
+    dayy+=1
+    day.configure(text=f"День - {dayy}")
     r.after(2000, lambda: news.set("Новости Азебайджана лучши новость только у нас!"))
     r.after(60000, new_news)
 def check():
@@ -201,11 +222,13 @@ def check():
         db["proc"] = 0
         db["choise"] = "Нет"
         db["cheats"] = True
+        db["dayy"] = 0
         ka, ur, den, rabotau, rabota = 0, 0, 0, 1, 1
         kopatik, strimik = False, False
         kar, ura, balance, timer = 22, 50, 500, 0.0
         cena, profit, rep, proc, choise = 0, 0, 0, 0, "Нет"
         cheats = True
+        dayy = 0
         db.close()
     else:
         r.after(1, check)
@@ -229,6 +252,8 @@ def autosave():
         db["rep"] = rep
         db["proc"] = proc
         db["choise"] = choise
+        db["stavka"] = stavka
+        db["dayy"] = dayy
     savel.configure(text="Сохранено!")
     r.after(2000, lambda: savel.configure(text="..."))
     r.after(10000, autosave)
@@ -244,7 +269,10 @@ def sosed():
         option_2="Не отдавать"
     )
         if msg.get() == "Отдать":
-            ka-=kart
+            if ka < kart:
+                ka-=ka
+            else:
+                ka-=kart
             if random.randint(1, 100) <= 10:
                 ka+=kart*3
                 alert = CTkMessagebox(
@@ -374,13 +402,18 @@ def invs():
     inw.geometry('300x300')
     inw.configure(fg_color="#1a1a1a")
     inw.resizable(False, False)
+    r.wm_attributes("-topmost", False)
+    inw.wm_attributes("-topmost", True)
+    
     inww = customtkinter.CTkLabel(inw, text_color="#57A3F2", text=" Выберете компанию и сумму вклада: \n Через минуту деньги зачислятся на баланс", font=customtkinter.CTkFont(size=10, weight="bold"))
     inww.pack(pady=5, padx=20)
     inc = customtkinter.CTkEntry(inw, placeholder_text="Сумма")
     inc.pack(pady=10)
+    
     komps = customtkinter.CTkOptionMenu(inw, values=["50% на повышенеие, 50% на понижение, разброс цен маленький", "75% на понижение, 25% на повышение, разброс цен средний", "90% на понижение, 10% на повышение, разброс цен большой", "99% на понижение, 1% на повышение, разброс цен огромный"], width=200, dynamic_resizing=True)
     komps.set("Компании")
     komps.pack(pady=10, padx=5)
+    
     invb = customtkinter.CTkButton(inw, text="Выбрать", fg_color="#57A3F2", width=200, text_color="#1a1a1a", font=customtkinter.CTkFont(size=15), command=invok)
     invb.pack(anchor="center", pady=0, padx=20)
 def mini():
@@ -438,22 +471,28 @@ def gigant():
 def invok():
     global geti, inc, komps, inw, den, ins, inv, summ
     geti=komps.get()
-    summ=int(inc.get())
-    den-=summ
-    dengi.configure(text=f"💵 Деняк : {den}")
-    inw.destroy()
-    inv.configure(state="disabled")
-    if geti == "50% на повышенеие, 50% на понижение, разброс цен маленький":
-        r.after(60000, mini)
-    elif geti == "75% на понижение, 25% на повышение, разброс цен средний":
-        r.after(60000, sred)
-    elif geti == "90% на понижение, 10% на повышение, разброс цен большой":
-        r.after(60000, big)
-    elif geti == "99% на понижение, 1% на повышение, разброс цен огромный":
-        r.after(60000, gigant)
-    else:
-        den+=summ
-    r.after(120000, lambda: inv.configure(state="normal"))
+    try:
+        summ=int(inc.get())
+        den-=summ
+        dengi.configure(text=f"💵 Деняк : {den}")
+        inw.destroy()
+        r.wm_attributes("-topmost", True)
+        inv.configure(state="disabled")
+        if geti == "50% на повышенеие, 50% на понижение, разброс цен маленький":
+            r.after(60000, mini)
+        elif geti == "75% на понижение, 25% на повышение, разброс цен средний":
+            r.after(60000, sred)
+        elif geti == "90% на понижение, 10% на повышение, разброс цен большой":
+            r.after(60000, big)
+        elif geti == "99% на понижение, 1% на повышение, разброс цен огромный":
+            r.after(60000, gigant)
+        else:
+            den+=summ
+            inv.configure(state="normal")
+        r.after(120000, lambda: inv.configure(state="normal"))
+    except ValueError:
+        inw.destroy()
+        r.wm_attributes("-topmost", True)
 def reset():
     global ka, ur, den, rabotau, rabota, kopatik, strimik, kar, ura, balance, timer, cena, profit, rep, proc, choise
     msg = CTkMessagebox(
@@ -481,10 +520,12 @@ def reset():
         db["rep"] = 0
         db["proc"] = 0
         db["choise"] = "Нет"
+        db["stavka"] = 20
         ka, ur, den, rabotau, rabota = 0, 0, 0, 1, 1
         kopatik, strimik = False, False
         kar, ura, balance, timer = 22, 50, 500, 0.0
         cena, profit, rep, proc, choise = 0, 0, 0, 0, "Нет"
+        stavka = 20
         db.close()
         r.destroy()
 def setd():
@@ -538,8 +579,12 @@ def autocliker():
 def mozhno():
     global proh, chpb
     proh = bool(chpb.get())
+def nal():
+    global stavka, chse
+    stavka = int(chse.get())
+    stavkal.configure(text=f"Налоги - {stavka}%")
 def cheatsd():
-    global che, chke, chue, chkob, chstb, churae, chkare, chab, chpb
+    global che, chke, chue, chkob, chstb, churae, chkare, chab, chpb, chse
     ch = customtkinter.CTkToplevel(r)
     ch.title("Читы")
     ch.geometry('600x600')
@@ -613,13 +658,32 @@ def cheatsd():
     chpb = customtkinter.CTkSwitch(chpf, onvalue=1, offvalue=0, command=mozhno, variable=vap, text="") 
     chpb.pack(padx=10, side="left")
     chpb.select()
-    
+
+    chsf = customtkinter.CTkFrame(ch, fg_color="#383838", corner_radius=15)
+    chsf.pack(pady=5, padx=10)
+    chse = customtkinter.CTkEntry(chkarf, placeholder_text="Налоги")
+    chse.pack(pady=5, padx=10, side = "left")
+    chsb = customtkinter.CTkButton(chkarf, text="Установить", fg_color="#a6d388", width=200, text_color="#1a1a1a", font=customtkinter.CTkFont(size=14), command=setkar) 
+    chsb.pack(padx=10, side="left")
+def ploti():
+    global stavka, den
+    msg = CTkMessagebox(
+        title="Плоти", 
+        message=f"У вас забрали {stavka}% деняк из-за налогов", 
+        icon="warning",
+        option_1="ОК"
+    )
+    den=round(den*(1-stavka/100))
+    dengi.configure(text=f"💵 Деняк : {den}")
+    stavkal.configure(text=f"Налоги - {stavka}%")
+    r.after(300000, ploti)
 r = customtkinter.CTk()
 customtkinter.set_default_color_theme("green")
 r.title("Симулятор Азербайджана")
 r.geometry('750x750')
 r.configure(fg_color="#1a1a1a")
 r.resizable(False, False)
+r.wm_attributes("-topmost", True)
 
 go = customtkinter.CTkLabel(r, text="")
 go.pack()
@@ -645,6 +709,12 @@ tuts.pack(pady=5, padx=20)
 goal = customtkinter.CTkLabel(tutf, text_color="#57A3F2", text=f"Цель - 1000000 деняк", font=customtkinter.CTkFont(size=11, weight="bold"))
 goal.pack(pady=5, padx=20)
 
+stavkal = customtkinter.CTkLabel(tutf, text_color="#57A3F2", text=f"Налоги - {stavka}%", font=customtkinter.CTkFont(size=11, weight="bold"))
+stavkal.pack(padx=20)
+
+day = customtkinter.CTkLabel(tutf, text_color="#57A3F2", text=f"День - {dayy}", font=customtkinter.CTkFont(size=11, weight="bold"))
+day.pack(padx=20)
+
 news = customtkinter.CTkOptionMenu(tutf, values=[], width=500, dynamic_resizing=True)
 news.set("Новости Азебайджана лучши новость только у нас!")
 news.pack(pady=10, padx=5, side="left")
@@ -658,7 +728,7 @@ butons2.pack(pady=3, padx=5, fill="both")
 sell = customtkinter.CTkButton(butons2, text="Продать все 📠", fg_color="#a6d388", width=200, text_color="#1a1a1a", font=customtkinter.CTkFont(size=24), command=sell)
 sell.pack(anchor="w", pady=0, padx=10, side="left")
 
-up = customtkinter.CTkOptionMenu(butons2, values=[f"Работник на поле азербайджанской картошки: +1 картошка за один урожай (Стоимость - {balance} деняк).", "Работник на урановые рудники: Позволяет копать уран (Стоимость - 5000 деняк).","Сосед, работающий на урановом руднике: +1 к урану за камень (Стоимость - 5000)","Капитанчик, который сидит в подвале: позволяет снимать стримы (надо кликнуть 10 раз на кнопку)(Стоимость - 10000 деняк)."], command=up, dynamic_resizing=True)
+up = customtkinter.CTkOptionMenu(butons2, values=[f"Работник на поле азербайджанской картошки: +1 картошка за один урожай (Стоимость - {balance} деняк).", "Работник на урановые рудники: Позволяет копать уран (Стоимость - 5000 деняк).","Сосед, работающий на урановом руднике: +1 к урану за камень (Стоимость - 5000)","Капитанчик, который сидит в подвале: позволяет снимать стримы (надо кликнуть 10 раз на кнопку)(Стоимость - 10000 деняк).", "Оптимизирование расходов: снижает налоги на 1% (Стоимость - 1000)"], command=up, dynamic_resizing=True)
 up.set("Улучшения")
 up.pack(pady=5, side="left")
 
@@ -682,16 +752,16 @@ info = customtkinter.CTkFrame(mf,fg_color="#383838", corner_radius=15 )
 info.pack(pady=10, padx=20, fill="both")
 
 kartoshka = customtkinter.CTkLabel(info, text_color="#f9de60", text=f"🥔 Азербайджанской картошки : {ka}")
-kartoshka.pack(pady=10, padx=20, side="left")
+kartoshka.pack(padx=20, side="left")
 
 uran = customtkinter.CTkLabel(info, text_color="#74ff17", text=f"⛏ Урана : {ur}")
-uran.pack(pady=0, padx=20, side="left")
+uran.pack(padx=20, side="left")
 
 dengi = customtkinter.CTkLabel(info, text_color="#a6d388", text=f"💵 Деняк : {den}")
-dengi.pack(pady=10, padx=20, side="left")
+dengi.pack(padx=20, side="left")
 
 savel = customtkinter.CTkLabel(info, text_color="#494949", text="...")
-savel.pack(pady=10, padx=10, side="left")
+savel.pack(padx=10, side="left")
 
 kontf = customtkinter.CTkFrame(mf,fg_color="#383838", corner_radius=15 )
 kontf.pack(padx=20, fill="both")
@@ -711,7 +781,7 @@ if cheats == True:
 if rep == 0:
     cena, profit, rep, proc, choise = 0, 0, 0, 0, "Нет"
 
-kontl = customtkinter.CTkLabel(kontf, text_color="#57A3F2", text=f"Контракт с {choise} \n Забирают картошки в день: {proc*100}% \n Комиссия: {100-profit}% \n Продают картошку по {cena} деняк \n Репутации: {rep}", font=customtkinter.CTkFont(size=16, weight="bold"))
+kontl = customtkinter.CTkLabel(kontf, text_color="#57A3F2", text=f"Контракт с {choise} \n Забирают картошки в день: {proc*100}% \n Комиссия: {100-profit}% \n Продают картошку по {cena} деняк \n Репутации: {rep}", font=customtkinter.CTkFont(size=11, weight="bold"))
 kontl.pack(pady=5, padx=20)
 
 kontb = customtkinter.CTkButton(kontf, text="Рассторгнуть контракт", fg_color="#57A3F2", width=200, text_color="#1a1a1a", font=customtkinter.CTkFont(size=24), command=kont)
@@ -727,4 +797,6 @@ if rep == 0:
     r.after(rand, com)
 if rep != 0:
     r.after(60000, yes)
+r.after(300000, ploti)
 r.mainloop()
+
